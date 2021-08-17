@@ -7,6 +7,7 @@ except ModuleNotFoundError:
 
 class Utilities:
     """contains functions not big enough to put into their own module"""
+
     def __init__(self, yt_key=None):
         self.yt_key = yt_key
 
@@ -15,7 +16,7 @@ class Utilities:
         """
         :return: a string containing what commands the bot has
         """
-        return 'The commands are: tag, git, and avatar. Each one has their own help command except for git.'
+        return "The commands are: tag, git, and avatar. Each one has their own help command except for git."
 
     @staticmethod
     def git():
@@ -34,7 +35,13 @@ class Utilities:
             return "need a YouTube API key"
         api_service_name = "youtube"
         api_version = "v3"
-        youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=self.yt_key)
-        result = youtube.search().list(q=query, part="snippet", maxResults=1, type='video').execute()
-        video_id = result['items'][0]['id']['videoId']
+        youtube = googleapiclient.discovery.build(
+            api_service_name, api_version, developerKey=self.yt_key
+        )
+        result = (
+            youtube.search()
+            .list(q=query, part="snippet", maxResults=1, type="video")
+            .execute()
+        )
+        video_id = result["items"][0]["id"]["videoId"]
         return "http://youtu.be/{}".format(video_id)
