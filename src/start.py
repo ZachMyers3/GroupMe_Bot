@@ -61,6 +61,11 @@ def main():
     except KeyError:
         yt_key = None
 
+    try:
+        espn_league_id = config_parser["keys"]["espn_league_id"]
+    except KeyError:
+        espn_league_id = None
+
     delim = config_parser["bot"]["delim"]
     refresh_group_interval = int(
         config_parser["bot"]["refresh_group_interval"]
@@ -113,6 +118,7 @@ def main():
                     group,
                     yt_key=yt_key,
                     delim=delim,
+                    espn_league_id=espn_league_id,
                     refresh_group_interval=refresh_group_interval,
                 )
                 print(

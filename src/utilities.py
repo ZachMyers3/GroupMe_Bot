@@ -16,7 +16,10 @@ class Utilities:
         """
         :return: a string containing what commands the bot has
         """
-        return "The commands are: tag, git, and avatar. Each one has their own help command except for git."
+        return (
+            "The commands are: tag, git, avatar, scoreboard, and teams. Each "
+            "one has their own help command except for git."
+        )
 
     @staticmethod
     def git():

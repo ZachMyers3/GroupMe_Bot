@@ -3,6 +3,7 @@
 from threading import Timer, Event
 from utilities import Utilities
 from tags import Tags
+from espn_ff import ESPNLeague
 import googleapiclient.errors
 from datetime import datetime
 
@@ -16,7 +17,12 @@ class Bot:
     and processing them"""
 
     def __init__(
-        self, group, yt_key=None, delim="$", refresh_group_interval=600
+        self,
+        group,
+        yt_key=None,
+        espn_league_id=None,
+        delim="$",
+        refresh_group_interval=600,
     ):
         """
         :param group: the group this object will read messages from
@@ -29,7 +35,22 @@ class Bot:
         self.delim = delim
         self.ult = Utilities(yt_key)
         self.tags = Tags(group.name, group.id, group.members)
-        self.valid_commands = ["avatar", "git", "yt", "tag", "help"]
+        self.espn_league_id = espn_league_id
+        current_year = int(datetime.now().strftime("%Y"))
+        self.league = ESPNLeague(
+            league_id=self.espn_league_id,
+            league_year=current_year,
+        )
+        self.valid_commands = [
+            "avatar",
+            "git",
+            "yt",
+            "tag",
+            "help",
+            "scoreboard",
+            "teams",
+            "standings",
+        ]
         Timer(refresh_group_interval, self.reload_group).start()
 
     def get_message(self):
@@ -41,9 +62,8 @@ class Bot:
             return self.group.messages.list()[0]
         except Exception as err:
             print(
-                "{} - Exception: {}: bot.get_message: {}".format(
-                    get_current_datetime(), self.group.name, err
-                )
+                f"{get_current_datetime()} - Exception: {self.group.name}: "
+                f"bot.get_message: {err}"
             )
             return None
 
@@ -117,9 +137,8 @@ class Bot:
                 self.group.post(message)
         except Exception as err:
             print(
-                "{} - Exception: {}: bot.send_message: {}".format(
-                    get_current_datetime(), self.group.name, err
-                )
+                f"{get_current_datetime()} - Exception: {self.group.name}: "
+                f"bot.send_message: {err}"
             )
 
     def process_message(self, message):
@@ -140,13 +159,9 @@ class Bot:
                     user_id = message.user_id
                     owner = self.find_owner_name(user_id)
                     print(
-                        "{} - {}: Processing from {}: {}, Command: {}".format(
-                            get_current_datetime(),
-                            self.group.name,
-                            owner,
-                            message_text,
-                            command,
-                        )
+                        f"{get_current_datetime()} - {self.group.name}: "
+                        f"Processing from {owner}: {message_text}, "
+                        f"Command: {command}"
                     )
                     result = None
                     if command == "help":
@@ -164,12 +179,19 @@ class Bot:
                         result = self.tags.parse_commands(
                             message_text, user_id, message.attachments
                         )
+                    if command == "scoreboard":
+                        result = self.league.get_scoreboard(
+                            week=None
+                        )
+                    if command == "teams":
+                        result = self.league.get_teams()
+                    if command == "standings":
+                        result = self.league.get_standings()
 
                     if result is not None:
                         print(
-                            '{} - {}: posting "{}"'.format(
-                                get_current_datetime(), self.group.name, result
-                            )
+                            f"{get_current_datetime()} - {self.group.name}: "
+                            f'posting "{result}"'
                         )
                         self.send_message(result)
             except Exception as err:
@@ -179,7 +201,6 @@ class Bot:
                     pass
                 else:
                     print(
-                        "{} - {}: bot.process_message: {}".format(
-                            get_current_datetime(), self.group.name, err
-                        )
+                        f"{get_current_datetime()} - {self.group.name}: "
+                        f"bot.process_message: {err}"
                     )
