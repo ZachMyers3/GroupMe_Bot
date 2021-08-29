@@ -1,0 +1,13 @@
+---
+version: "3"
+
+services:
+  groupme:
+    image: groupme-bot:latest
+    # name: groupme
+    restart: unless-stopped
+    volumes:
+      - "/home/homelab/Projects/GroupMe_Bot/data/tags:/app/tags"
+      - "/home/homelab/Projects/GroupMe_Bot/data/creds:/app/creds"
+      - "/home/homelab/Projects/GroupMe_Bot/groups.json:/app/groups.json"
+      - "/home/homelab/Projects/GroupMe_Bot/config.ini:/app/config.ini"

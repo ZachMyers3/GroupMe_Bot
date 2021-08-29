@@ -50,6 +50,7 @@ class Bot:
             "scoreboard",
             "teams",
             "standings",
+            "draft",
         ]
         Timer(refresh_group_interval, self.reload_group).start()
 
@@ -151,7 +152,7 @@ class Bot:
             try:
                 message_text = message.text.lower()
                 delim = message_text[: len(self.delim)]
-                message_text = message_text[len(self.delim):]
+                message_text = message_text[len(self.delim) :]
                 message_text = message_text.split(" ")
                 command = message_text[0]
 
@@ -180,13 +181,15 @@ class Bot:
                             message_text, user_id, message.attachments
                         )
                     if command == "scoreboard":
-                        result = self.league.get_scoreboard(
-                            week=None
-                        )
+                        result = self.league.get_scoreboard(week=None)
                     if command == "teams":
                         result = self.league.get_teams()
                     if command == "standings":
                         result = self.league.get_standings()
+                    if command == "draft":
+                        result = (
+                            "The draft is Tuesday, August 31st at 8:15 PM EST."
+                        )
 
                     if result is not None:
                         print(
